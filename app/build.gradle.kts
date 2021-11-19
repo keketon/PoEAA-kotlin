@@ -38,5 +38,5 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass.set("example.PoEAA.AppKt")
+    mainClass.set("example.poeaa.AppKt")
 }
