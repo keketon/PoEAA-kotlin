@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS balance_sheet.sample(
+    id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='sample';
