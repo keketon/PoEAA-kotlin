@@ -13,6 +13,7 @@ class ConnectTcp {
 
     fun receive() {
         while (true) {
+            // TCP layer
             lateinit var svSock: ServerSocket
             lateinit var sock: Socket
             lateinit var input: InputStream
@@ -45,14 +46,15 @@ class ConnectTcp {
                 input.close()
                 output.close()
                 svSock.close()
+                ConnectionPool.getInstance().closeAll()
             }
         }
     }
 
     private fun httpRes(type: String, response: Any?): ByteArray {
-        val serializedResponse = if(type == "application/json") {
+        val serializedResponse = if (type == "application/json") {
             mapper.writeValueAsString(response)
-        }else {
+        } else {
             response as String
         }
 
