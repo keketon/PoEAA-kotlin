@@ -32,6 +32,9 @@ dependencies {
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
     implementation("mysql:mysql-connector-java:8.0.20")
 
+    // https://github.com/FasterXML/jackson
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.3.4")
+
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 
