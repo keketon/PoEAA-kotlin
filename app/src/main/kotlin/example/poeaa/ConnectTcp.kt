@@ -36,21 +36,25 @@ class ConnectTcp {
                 val response = Router(method = httpMethod, path = path).exec()
 
                 output.write(this.httpRes(type = "text/html; charset=UTF-8", response = response))
+                output.flush()
             } catch (e: IOException) {
                 e.printStackTrace()
             } catch (e: NotImplementedError) {
                 e.printStackTrace()
             } finally {
-                output.flush()
                 input.close()
+                output.close()
                 svSock.close()
             }
         }
     }
 
     private fun httpRes(type: String, response: Any?): ByteArray {
-//        val serializedResponse = mapper.writeValueAsString(response)
-        val serializedResponse = response as String
+        val serializedResponse = if(type == "application/json") {
+            mapper.writeValueAsString(response)
+        }else {
+            response as String
+        }
 
         val resStr = """
             HTTP/1.1 200 OK
