@@ -25,12 +25,13 @@ DROP TABLE IF EXISTS balance_sheet.projects;
 CREATE TABLE balance_sheet.projects(
     id char(36) NOT NULL,
     name varchar(200) NOT NULL,
+    cost BIGINT NOT NULL DEFAULT 0,
     PRIMARY KEY (id),
     UNIQUE (name)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='projects';
 
 INSERT INTO balance_sheet.projects
-VALUES ('80811c8f-9332-4ab5-9e82-d563e3a20eb2', 'projectX');
+VALUES ('80811c8f-9332-4ab5-9e82-d563e3a20eb2', 'projectX', 0);
 
 DROP TABLE IF EXISTS balance_sheet.assignments;
 CREATE TABLE balance_sheet.assignments(
