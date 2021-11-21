@@ -12,6 +12,8 @@ class App {
 
 fun main() {
     println(App().greeting)
-    val result = ConnectDb().select() ?: throw IllegalStateException("Result set is null")
-    println("id is: $result")
+    val tcpConn = ConnectTcp()
+    tcpConn.receive()
+//    val result = ConnectDb().select() ?: throw IllegalStateException("Result set is null")
+//    println("id is: $result")
 }

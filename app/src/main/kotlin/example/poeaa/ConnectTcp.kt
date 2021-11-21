@@ -1,17 +1,28 @@
 package example.poeaa
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.ServerSocket
+import java.net.Socket
 import java.nio.charset.Charset
 
 class ConnectTcp {
+    private val mapper = ObjectMapper()
+
     fun receive() {
         while (true) {
+            lateinit var svSock: ServerSocket
+            lateinit var sock: Socket
+            lateinit var input: InputStream
+            lateinit var output: OutputStream
+
             try {
-                val svSock = ServerSocket(8080)
-                val sock = svSock.accept()
-                val input = sock.getInputStream()
-                val output = sock.getOutputStream()
+                svSock = ServerSocket(8080)
+                sock = svSock.accept()
+                input = sock.getInputStream()
+                output = sock.getOutputStream()
 
                 var data = ByteArray(1024)
                 val readSize = input.read(data)
@@ -19,27 +30,34 @@ class ConnectTcp {
                 //受信データを読み込んだサイズまで切り詰め
                 data = data.copyOf(readSize)
 
-                // TODO: various processes
-                println("received:\n" + String(data, Charset.forName("UTF-8")) + "\nreceived end.")
+                val dataStr = String(data, Charset.forName("UTF-8")).split("\n")
+                println("received:\n${dataStr.joinToString("\n")}\nreceived end.")
+                val (httpMethod, path) = dataStr[0].split(" ")
+                val response = Router(method = httpMethod, path = path).exec()
 
-                output.write(this.httpRes(0, "application/json"))
-                output.flush()
-
-                input.close()
-                svSock.close()
+                output.write(this.httpRes(type = "application/json", response = response))
             } catch (e: IOException) {
                 e.printStackTrace()
+            } catch (e: NotImplementedError) {
+                e.printStackTrace()
+            } finally {
+                output.flush()
+                input.close()
+                svSock.close()
             }
         }
     }
 
-    private fun httpRes(len: Int, type: String): ByteArray {
+    private fun httpRes(type: String, response: Any?): ByteArray {
+        val serializedResponse = mapper.writeValueAsString(response)
+
         val resStr = """
             HTTP/1.1 200 OK
             Connection: close
-            Content-Length: $len
+            Content-Length: ${serializedResponse.length}
             Content-Type: $type
-             
+
+            $serializedResponse
         """.trimIndent()
 
         return resStr.toByteArray()
