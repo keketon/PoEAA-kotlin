@@ -13,6 +13,7 @@ class ConnectTcp {
 
     fun receive() {
         while (true) {
+            // TCP layer
             lateinit var svSock: ServerSocket
             lateinit var sock: Socket
             lateinit var input: InputStream
@@ -33,7 +34,8 @@ class ConnectTcp {
                 val dataStr = String(data, Charset.forName("UTF-8")).split("\n")
                 println("received:\n${dataStr.joinToString("\n")}\nreceived end.")
                 val (httpMethod, path) = dataStr[0].split(" ")
-                val response = Router(method = httpMethod, path = path).exec()
+                val body = dataStr.last()
+                val response = Router(method = httpMethod, path = path).exec(body)
 
                 output.write(this.httpRes(type = "text/html; charset=UTF-8", response = response))
                 output.flush()
@@ -45,14 +47,15 @@ class ConnectTcp {
                 input.close()
                 output.close()
                 svSock.close()
+                ConnectionPool.getInstance().closeAll()
             }
         }
     }
 
     private fun httpRes(type: String, response: Any?): ByteArray {
-        val serializedResponse = if(type == "application/json") {
+        val serializedResponse = if (type == "application/json") {
             mapper.writeValueAsString(response)
-        }else {
+        } else {
             response as String
         }
 
