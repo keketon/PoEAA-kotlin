@@ -30,6 +30,6 @@ class ConnectionPool private constructor() {
     }
 
     fun closeAll() {
-        connections.forEach(Connection::close)
+        connections.onEach(Connection::close).clear()
     }
 }
