@@ -9,14 +9,14 @@ data class Router(
         val method: String,
         val path: String
 ) {
-    fun exec(): Any? {
+    fun exec(request: String): Any? {
         return when (path) {
             "/" -> when (method) {
                 "GET" -> IndexController().get()
                 else -> throw NotImplementedError()
             }
             "/project" -> when (method) {
-                "POST" -> ProjectController().post()
+                "POST" -> ProjectController().post(request)
                 else -> throw NotImplementedError()
             }
 //            "/assignment" -> when (method) {

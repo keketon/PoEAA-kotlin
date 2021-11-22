@@ -34,7 +34,8 @@ class ConnectTcp {
                 val dataStr = String(data, Charset.forName("UTF-8")).split("\n")
                 println("received:\n${dataStr.joinToString("\n")}\nreceived end.")
                 val (httpMethod, path) = dataStr[0].split(" ")
-                val response = Router(method = httpMethod, path = path).exec()
+                val body = dataStr.last()
+                val response = Router(method = httpMethod, path = path).exec(body)
 
                 output.write(this.httpRes(type = "text/html; charset=UTF-8", response = response))
                 output.flush()
