@@ -1,6 +1,6 @@
 package example.poeaa.exceptions
 
-class DatabaseException(
+class DomainException(
     message: String = "",
     cause: Exception? = null,
 ) : RuntimeException(message, cause)
