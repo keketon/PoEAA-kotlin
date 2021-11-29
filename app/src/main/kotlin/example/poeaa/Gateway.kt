@@ -1,15 +1,24 @@
 package example.poeaa
 
-import example.poeaa.exceptions.ApplicationException
 import example.poeaa.exceptions.DatabaseException
-import java.sql.Array
 import java.sql.ResultSet
 import java.util.UUID
 
 class Gateway private constructor() {
-    fun findAssignmentByEmployeeId(employeeId: UUID): ResultSet {
-        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(findAssignmentByEmployeeIdStatement)
-        stmt.setString(1, employeeId.toString())
+    fun findAssignmentByEngineerId(engineerId: UUID): ResultSet {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(findAssignmentByEngineerIdStatement)
+        stmt.setString(1, engineerId.toString())
+        return stmt.executeQuery()
+    }
+
+    fun findAssignmentByEngineerIds(engineerIds: Collection<UUID>): ResultSet {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(
+            findAssignmentByEngineerIdsStatement.replace("?", List(engineerIds.size) { '?' }.joinToString(","))
+        )
+
+        engineerIds.forEachIndexed { index, uuid ->
+            stmt.setString(index + 1, uuid.toString())
+        }
         return stmt.executeQuery()
     }
 
@@ -21,7 +30,7 @@ class Gateway private constructor() {
 
     fun findEngineers(engineerIds: Collection<UUID>): ResultSet {
         val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(
-                findEngineersStatement.replace("?", List(engineerIds.size) { '?' }.joinToString(","))
+            findEngineersStatement.replace("?", List(engineerIds.size) { '?' }.joinToString(","))
         )
 
         engineerIds.forEachIndexed { index, uuid ->
@@ -54,25 +63,29 @@ class Gateway private constructor() {
             return instance ?: throw RuntimeException()
         }
 
-        private const val findAssignmentByEmployeeIdStatement =
-                "SELECT * " +
-                        " FROM assignments " +
-                        " WHERE engineer_id = ?"
+        private const val findAssignmentByEngineerIdStatement =
+            "SELECT * " +
+                    " FROM assignments " +
+                    " WHERE engineer_id = ?"
+        private const val findAssignmentByEngineerIdsStatement =
+            "SELECT * " +
+                    " FROM assignments " +
+                    " WHERE engineer_id IN (?)"
         private const val findAssignmentByProjectIdStatement =
-                "SELECT * " +
-                        " FROM assignments " +
-                        " WHERE project_id = ?"
+            "SELECT * " +
+                    " FROM assignments " +
+                    " WHERE project_id = ?"
         private const val findEngineersStatement =
-                "SELECT * " +
-                        " FROM engineers " +
-                        " WHERE id IN (?)"
+            "SELECT * " +
+                    " FROM engineers " +
+                    " WHERE id IN (?)"
         private const val findProjectStatement =
-                "SELECT * " +
-                        " FROM projects " +
-                        " WHERE id = ?"
+            "SELECT * " +
+                    " FROM projects " +
+                    " WHERE id = ?"
         private const val updateProjectStatement =
-                "UPDATE projects " +
-                        " SET cost = ? " +
-                        " WHERE id = ?"
+            "UPDATE projects " +
+                    " SET cost = ? " +
+                    " WHERE id = ?"
     }
 }
