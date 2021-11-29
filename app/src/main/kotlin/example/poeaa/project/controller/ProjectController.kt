@@ -1,4 +1,4 @@
-package example.poeaa.project
+package example.poeaa.project.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import example.poeaa.assignment.usecase.ProjectCostCalculationByTransactionScriptService
