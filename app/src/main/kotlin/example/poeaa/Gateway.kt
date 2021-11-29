@@ -30,6 +30,12 @@ class Gateway private constructor() {
         return stmt.executeQuery()
     }
 
+    fun findProject(projectId: UUID): ResultSet {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(findProjectStatement)
+        stmt.setString(1, projectId.toString())
+        return stmt.executeQuery()
+    }
+
     fun updateProject(id: UUID, cost: Long) {
         val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(updateProjectStatement)
         stmt.setLong(1, cost)
@@ -60,6 +66,10 @@ class Gateway private constructor() {
                 "SELECT * " +
                         " FROM engineers " +
                         " WHERE id IN (?)"
+        private const val findProjectStatement =
+                "SELECT * " +
+                        " FROM projects " +
+                        " WHERE id = ?"
         private const val updateProjectStatement =
                 "UPDATE projects " +
                         " SET cost = ? " +
