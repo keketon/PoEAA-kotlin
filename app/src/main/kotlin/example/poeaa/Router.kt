@@ -1,9 +1,6 @@
 package example.poeaa
 
-import example.poeaa.assignment.controller.AssignmentController
-import example.poeaa.project.ProjectController
-import java.sql.Connection
-import java.util.UUID
+import example.poeaa.project.controller.ProjectController
 
 data class Router(
         val method: String,
