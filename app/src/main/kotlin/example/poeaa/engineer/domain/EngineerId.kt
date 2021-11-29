@@ -5,6 +5,6 @@ import java.util.UUID
 data class EngineerId(val value: UUID) {
     companion object {
         fun fromString(value: String): EngineerId =
-                EngineerId(UUID.fromString(value))
+            EngineerId(UUID.fromString(value))
     }
 }

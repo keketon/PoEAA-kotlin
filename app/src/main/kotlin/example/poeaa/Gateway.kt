@@ -35,13 +35,14 @@ class Gateway private constructor() {
         stmt.executeUpdate()
     }
 
-    fun insertAssignment(projectId: UUID, engineerIds: Collection<UUID>) {
+    fun insertAssignment(projectId: UUID, engineerIdsToCommit: Map<UUID, Long>) {
         val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(
-            insertAssignmentStatement.replace("?", List(engineerIds.size) { "(?, ?)" }.joinToString(","))
+            insertAssignmentStatement.replace("?", List(engineerIdsToCommit.size) { "(?, ?, ?)" }.joinToString(","))
         )
-        engineerIds.forEachIndexed { index, engineerId ->
-            stmt.setString(2 * index + 1, projectId.toString())
-            stmt.setString(2 * index + 2, engineerId.toString())
+        engineerIdsToCommit.onEachIndexed { index, (engineerId, commit) ->
+            stmt.setString(3 * index + 1, projectId.toString())
+            stmt.setString(3 * index + 2, engineerId.toString())
+            stmt.setLong(3 * index + 3, commit)
         }
 
         stmt.executeUpdate()
@@ -74,7 +75,7 @@ class Gateway private constructor() {
     }
 
     fun updateProject(id: UUID, name: String, cost: Long) {
-        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(updateProjectCostStatement)
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(updateProjectStatement)
         stmt.setString(1, name)
         stmt.setLong(2, cost)
         stmt.setString(3, id.toString())
@@ -105,10 +106,10 @@ class Gateway private constructor() {
                     " FROM assignments " +
                     " WHERE project_id = ?"
         private const val deleteAssignmentStatement =
-            "DELETE FROM assignment " +
+            "DELETE FROM assignments " +
                     " WHERE project_id = ?"
         private const val insertAssignmentStatement =
-            "INSERT INTO assignment(project_id, engineer_id) " +
+            "INSERT INTO assignments(project_id, engineer_id, commit_percent) " +
                     " VALUES ?"
         private const val findEngineersStatement =
             "SELECT * " +
@@ -124,8 +125,7 @@ class Gateway private constructor() {
                     " WHERE id = ?"
         private const val updateProjectStatement =
             "UPDATE projects " +
-                    " SET name = ? " +
-                    " SET cost = ? " +
+                    " SET name = ?, cost = ? " +
                     " WHERE id = ?"
     }
 }

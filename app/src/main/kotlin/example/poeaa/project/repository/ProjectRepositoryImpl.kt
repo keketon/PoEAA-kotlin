@@ -24,9 +24,10 @@ class ProjectRepositoryImpl private constructor() : ProjectRepository {
         }
 
         val assignmentResultSet = Gateway.getInstance().findAssignmentByProjectId(id.value)
-        val engineerIds = mutableSetOf<EngineerId>()
+        val engineerIdsToCommit = mutableMapOf<EngineerId, Long>()
         while (assignmentResultSet.next()) {
-            engineerIds.add(EngineerId.fromString(assignmentResultSet.getString("engineer_id")))
+            engineerIdsToCommit[EngineerId.fromString(assignmentResultSet.getString("engineer_id"))] =
+                assignmentResultSet.getLong("commit_percent")
         }
 
         return projectResultSet.run {
@@ -34,7 +35,7 @@ class ProjectRepositoryImpl private constructor() : ProjectRepository {
                 id = id,
                 name = getString("name"),
                 cost = getLong("cost"),
-                engineers = engineerIds
+                engineersCommit = engineerIdsToCommit
             )
         }
     }
@@ -45,6 +46,8 @@ class ProjectRepositoryImpl private constructor() : ProjectRepository {
         }
 
         Gateway.getInstance().deleteAssignment(project.id.value)
-        Gateway.getInstance().insertAssignment(project.id.value, project.engineers.map { it.value })
+        if (project.engineers.isNotEmpty()) {
+            Gateway.getInstance().insertAssignment(project.id.value, project.engineersCommit.mapKeys { it.key.value })
+        }
     }
 }

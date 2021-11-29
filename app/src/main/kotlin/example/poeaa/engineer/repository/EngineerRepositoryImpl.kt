@@ -19,6 +19,7 @@ class EngineerRepositoryImpl private constructor() : EngineerRepository {
     }
 
     override fun findByIds(ids: Collection<EngineerId>): Set<Engineer> {
+        if(ids.isEmpty()) return emptySet()
         val engineerUuids = ids.map { it.value }
         val engineerResultSet = Gateway.getInstance().findEngineers(engineerUuids)
         val assignmentResultSet = Gateway.getInstance().findAssignmentByEngineerIds(engineerUuids)

@@ -1,8 +1,6 @@
 package example.poeaa.assignment.usecase
 
-import example.poeaa.Gateway
 import example.poeaa.engineer.repository.EngineerRepositoryImpl
-import example.poeaa.exceptions.ApplicationException
 import example.poeaa.project.domain.ProjectId
 import example.poeaa.project.repository.ProjectRepositoryImpl
 import java.util.UUID
@@ -15,7 +13,8 @@ class ProjectCostCalculationByDomainModelService {
             .associateBy { it.id }
 
         val cost = project.engineers.sumOf { engineerId ->
-            project.cost * (engineers[engineerId]?.unitPrice ?: throw RuntimeException())
+            (project.engineersCommit[engineerId] ?: throw RuntimeException()) *
+                    (engineers[engineerId]?.unitPrice ?: throw RuntimeException())
         }
 
         val newProject = project.updateCost(cost)
