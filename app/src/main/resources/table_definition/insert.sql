@@ -1,3 +1,5 @@
+-- cp ~/projects/personal/PoEAA-kotlin/app/src/main/resources/table_definition/insert.sql mysql:/tmp/
+
 TRUNCATE balance_sheet.sample;
 INSERT INTO balance_sheet.sample
 VALUES ('04d88a00-e4b0-4f6e-95ee-1d30d84e2a27');

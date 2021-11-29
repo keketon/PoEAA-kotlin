@@ -1,3 +1,5 @@
+-- cp ~/projects/personal/PoEAA-kotlin/app/src/main/resources/table_definition/ddl.sql mysql:/tmp/
+
 CREATE
 DATABASE IF NOT EXISTS balance_sheet;
 
