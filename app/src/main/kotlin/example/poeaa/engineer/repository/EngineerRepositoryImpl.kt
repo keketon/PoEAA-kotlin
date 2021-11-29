@@ -5,8 +5,19 @@ import example.poeaa.engineer.domain.Engineer
 import example.poeaa.engineer.domain.EngineerId
 import example.poeaa.engineer.domain.EngineerRepository
 import example.poeaa.project.domain.ProjectId
+import example.poeaa.project.repository.ProjectRepositoryImpl
 
-class EngineerRepositoryImpl : EngineerRepository {
+class EngineerRepositoryImpl private constructor() : EngineerRepository {
+    companion object {
+        private var instance: EngineerRepositoryImpl? = null
+        fun getInstance(): EngineerRepositoryImpl {
+            if (instance == null) {
+                instance = EngineerRepositoryImpl()
+            }
+            return instance ?: throw RuntimeException()
+        }
+    }
+
     override fun findByIds(ids: Collection<EngineerId>): Set<Engineer> {
         val engineerUuids = ids.map { it.value }
         val engineerResultSet = Gateway.getInstance().findEngineers(engineerUuids)

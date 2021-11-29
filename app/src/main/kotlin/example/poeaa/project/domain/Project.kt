@@ -7,4 +7,6 @@ data class Project(
         val name: String,
         val cost: Long,
         val engineers: Set<EngineerId>
-)
+) {
+    fun updateCost(cost: Long): Project = copy(cost = cost)
+}

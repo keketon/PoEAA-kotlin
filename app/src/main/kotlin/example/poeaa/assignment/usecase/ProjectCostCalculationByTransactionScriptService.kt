@@ -23,7 +23,7 @@ class ProjectCostCalculationByTransactionScriptService {
             cost += unitPrice * commitPercent / 100L
         }
 
-        Gateway.getInstance().updateProject(id = projectId, cost = cost)
+        Gateway.getInstance().updateProjectCost(id = projectId, cost = cost)
         return cost
     }
 }

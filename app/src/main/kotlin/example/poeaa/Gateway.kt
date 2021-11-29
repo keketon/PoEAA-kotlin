@@ -28,6 +28,25 @@ class Gateway private constructor() {
         return stmt.executeQuery()
     }
 
+    fun deleteAssignment(projectId: UUID) {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(deleteAssignmentStatement)
+        stmt.setString(1, projectId.toString())
+
+        stmt.executeUpdate()
+    }
+
+    fun insertAssignment(projectId: UUID, engineerIds: Collection<UUID>) {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(
+            insertAssignmentStatement.replace("?", List(engineerIds.size) { "(?, ?)" }.joinToString(","))
+        )
+        engineerIds.forEachIndexed { index, engineerId ->
+            stmt.setString(2 * index + 1, projectId.toString())
+            stmt.setString(2 * index + 2, engineerId.toString())
+        }
+
+        stmt.executeUpdate()
+    }
+
     fun findEngineers(engineerIds: Collection<UUID>): ResultSet {
         val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(
             findEngineersStatement.replace("?", List(engineerIds.size) { '?' }.joinToString(","))
@@ -45,10 +64,20 @@ class Gateway private constructor() {
         return stmt.executeQuery()
     }
 
-    fun updateProject(id: UUID, cost: Long) {
-        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(updateProjectStatement)
+    fun updateProjectCost(id: UUID, cost: Long) {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(updateProjectCostStatement)
         stmt.setLong(1, cost)
         stmt.setString(2, id.toString())
+
+        val updated = stmt.executeUpdate()
+        if (updated < 1) throw DatabaseException("Failed to update project {id: $id}")
+    }
+
+    fun updateProject(id: UUID, name: String, cost: Long) {
+        val stmt = ConnectionPool.getInstance().getConnection().prepareStatement(updateProjectCostStatement)
+        stmt.setString(1, name)
+        stmt.setLong(2, cost)
+        stmt.setString(3, id.toString())
 
         val updated = stmt.executeUpdate()
         if (updated < 1) throw DatabaseException("Failed to update project {id: $id}")
@@ -75,6 +104,12 @@ class Gateway private constructor() {
             "SELECT * " +
                     " FROM assignments " +
                     " WHERE project_id = ?"
+        private const val deleteAssignmentStatement =
+            "DELETE FROM assignment " +
+                    " WHERE project_id = ?"
+        private const val insertAssignmentStatement =
+            "INSERT INTO assignment(project_id, engineer_id) " +
+                    " VALUES ?"
         private const val findEngineersStatement =
             "SELECT * " +
                     " FROM engineers " +
@@ -83,8 +118,13 @@ class Gateway private constructor() {
             "SELECT * " +
                     " FROM projects " +
                     " WHERE id = ?"
+        private const val updateProjectCostStatement =
+            "UPDATE projects " +
+                    " SET cost = ? " +
+                    " WHERE id = ?"
         private const val updateProjectStatement =
             "UPDATE projects " +
+                    " SET name = ? " +
                     " SET cost = ? " +
                     " WHERE id = ?"
     }
